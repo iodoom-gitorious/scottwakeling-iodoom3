@@ -98,6 +98,7 @@ include_directories(${SDL_INCLUDE_DIR})
 
 if (UNIX AND NOT APPLE)
 	find_package(X11 REQUIRED)
+	add_definitions(-DXTHREADS)
 	include_directories(${X11_INCLUDE_DIR})
 
 	if (os MATCHES ".*bsd" OR os STREQUAL "dragonfly")
@@ -137,10 +138,9 @@ if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
 	add_definitions(-fno-strict-aliasing)
 
 	CHECK_CXX_COMPILER_FLAG("-fvisibility=hidden" cxx_has_fvisibility)
-	if (NOT cxx_has_fvisibility)
-		message(FATAL_ERROR "Compiler does not support -fvisibility")
+	if (cxx_has_fvisibility)
+		add_definitions(-fvisibility=hidden)
 	endif()
-	add_definitions(-fvisibility=hidden)
 
 	# TODO fix these warnings
 	add_definitions(-Wno-sign-compare)
@@ -197,7 +197,7 @@ elseif (MSVC)
 	add_definitions(/wd4996) # 'function': was declared deprecated
 	set(CMAKE_C_FLAGS_DEBUG "-D_DEBUG /Od /Zi /MDd")
 	set(CMAKE_C_FLAGS_RELEASE "/Ox /Oy /MD")
-	set(CMAKE_C_FLAGS_RELWITHDEBINFO "/Ox /Oy /Zi /MD")
+	set(CMAKE_C_FLAGS_RELWITHDEBINFO "/Ox /Oy /Zi /MDd")
 	set(CMAKE_C_FLAGS_MINSIZEREL "/Ox /Oy /Os /MD")
 else()
 	message(FATAL_ERROR "Unsupported compiler")
@@ -214,10 +214,19 @@ if (WIN32)
 	add_definitions(-D_WIN32_WINNT=0x0501)
 
 	set(sys_libs ${sys_libs}
+		dinput8
+		ksuser
+		dxguid
 		winmm
 		iphlpapi
 		wsock32
 	)
+
+	if (MINGW)
+		list(APPEND sys_libs dxerr8)
+	else()
+		list(APPEND sys_libs dxerr)
+	endif()
 endif()
 
 message(STATUS "Building ${CMAKE_BUILD_TYPE} for ${os}.${cpu}")
@@ -646,15 +655,18 @@ elseif (WIN32)
 	set(src_sys_base
 		sys/cpu.cpp
 		sys/threads.cpp
-		sys/glimp.cpp
-		sys/events.cpp
 		sys/sys_local.cpp
 		sys/win32/win_cpu.cpp
+#		sys/win32/win_gamma.cpp
+		sys/win32/win_glimp.cpp
 		sys/win32/win_input.cpp
 		sys/win32/win_main.cpp
 		sys/win32/win_net.cpp
+		sys/win32/win_qgl.cpp
 		sys/win32/win_shared.cpp
 		sys/win32/win_syscon.cpp
+		sys/win32/win_taskkeyhook.cpp
+		sys/win32/win_wndproc.cpp
 	)
 
 	set(src_sys_core
@@ -664,7 +676,6 @@ else()
 	set(src_sys_base
 		sys/cpu.cpp
 		sys/threads.cpp
-		sys/events.cpp
 		sys/sys_local.cpp
 		sys/posix/posix_net.cpp
 		sys/posix/posix_signal.cpp
@@ -674,7 +685,10 @@ else()
 
 	set(src_sys_core
 		${src_stub_util}
-		sys/glimp.cpp
+		sys/posix/posix_input.cpp
+		sys/linux/glimp.cpp
+		sys/linux/input.cpp
+		sys/linux/libXNVCtrl/NVCtrl.c
 	)
 endif()
 
