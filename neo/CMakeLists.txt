@@ -138,9 +138,10 @@ if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
 	add_definitions(-fno-strict-aliasing)
 
 	CHECK_CXX_COMPILER_FLAG("-fvisibility=hidden" cxx_has_fvisibility)
-	if (cxx_has_fvisibility)
-		add_definitions(-fvisibility=hidden)
+	if (NOT cxx_has_fvisibility)
+		message(FATAL_ERROR "Compiler does not support -fvisibility")
 	endif()
+	add_definitions(-fvisibility=hidden)
 
 	# TODO fix these warnings
 	add_definitions(-Wno-sign-compare)
@@ -197,7 +198,7 @@ elseif (MSVC)
 	add_definitions(/wd4996) # 'function': was declared deprecated
 	set(CMAKE_C_FLAGS_DEBUG "-D_DEBUG /Od /Zi /MDd")
 	set(CMAKE_C_FLAGS_RELEASE "/Ox /Oy /MD")
-	set(CMAKE_C_FLAGS_RELWITHDEBINFO "/Ox /Oy /Zi /MDd")
+	set(CMAKE_C_FLAGS_RELWITHDEBINFO "/Ox /Oy /Zi /MD")
 	set(CMAKE_C_FLAGS_MINSIZEREL "/Ox /Oy /Os /MD")
 else()
 	message(FATAL_ERROR "Unsupported compiler")

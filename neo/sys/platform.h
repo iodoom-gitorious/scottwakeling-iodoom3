@@ -65,7 +65,7 @@ If you have questions concerning this license or the applicable additional terms
 #define assertmem( x, y )			assert( _CrtIsValidPointer( x, y, true ) )
 #else
 #ifdef GAME_DLL
-#define ID_GAME_API					_attribute__ ((visibility ("default")))
+#define ID_GAME_API					__attribute__((visibility ("default")))
 #else
 #define ID_GAME_API
 #endif
@@ -93,19 +93,14 @@ If you have questions concerning this license or the applicable additional terms
 #endif
 
 #ifdef GAME_DLL
-#define ID_GAME_API					_attribute__ ((visibility ("default")))
+#define ID_GAME_API					__attribute__((visibility ("default")))
 #else
 #define ID_GAME_API
 #endif
 
 #define ALIGN16( x )				x __attribute__ ((aligned (16)))
 
-#ifdef __MWERKS__
-#define PACKED
-#include <alloca.h>
-#else
 #define PACKED						__attribute__((packed))
-#endif
 
 #define _alloca						alloca
 #define _alloca16( x )				((void *)((((uintptr_t)alloca( (x)+15 )) + 15) & ~15))
@@ -162,7 +157,7 @@ If you have questions concerning this license or the applicable additional terms
 #define _alloca16( x )				((void *)((((uintptr_t)alloca( (x)+15 )) + 15) & ~15))
 
 #ifdef GAME_DLL
-#define ID_GAME_API					_attribute__ ((visibility ("default")))
+#define ID_GAME_API					__attribute__((visibility ("default")))
 #else
 #define ID_GAME_API
 #endif
