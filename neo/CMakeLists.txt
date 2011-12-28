@@ -639,6 +639,12 @@ if (APPLE)
 		sys/posix/posix_main.cpp
 	)
 
+	set(OSX_RESOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/sys/osx/Doom3.icns
+				"${CMAKE_CURRENT_SOURCE_DIR}/sys/osx/Doom 3.rsrc"
+				${CMAKE_CURRENT_SOURCE_DIR}/sys/osx/English.lproj
+				${CMAKE_CURRENT_SOURCE_DIR}/sys/osx/French.lproj)
+	set_source_files_properties( ${OSX_RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
 	set(src_sys_core
 		sys/posix/posix_input.cpp
 		sys/osx/PickMonitor.cpp
@@ -650,6 +656,8 @@ if (APPLE)
 		sys/osx/macosx_misc.mm
 #		sys/osx/macosx_utils.mm
 #		sys/osx/macosx_sys.mm
+		sys/osx/SDLMain.m
+		${OSX_RESOURCE_FILES}
 	)
 elseif (WIN32)
 	set(src_sys_base
@@ -700,15 +708,15 @@ if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang" AND NOT MING
 endif()
 
 if (CORE)
-	add_executable(doom3.${cpu} WIN32
+	add_executable(doom3-${cpu} WIN32 MACOSX_BUNDLE
 		${src_core}
 		${src_sys_base}
 		${src_sys_core}
 	)
-
-	set_target_properties(doom3.${cpu} PROPERTIES COMPILE_DEFINITIONS "__DOOM_DLL__")
-	set_target_properties(doom3.${cpu} PROPERTIES LINK_FLAGS "${ldflags}")
-	target_link_libraries(doom3.${cpu}
+	set_target_properties(doom3-${cpu} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/sys/osx/Info.plist )
+	set_target_properties(doom3-${cpu} PROPERTIES COMPILE_DEFINITIONS "__DOOM_DLL__")
+	set_target_properties(doom3-${cpu} PROPERTIES LINK_FLAGS "${ldflags}")
+	target_link_libraries(doom3-${cpu}
 		idlib${cpu}
 		${X11_X11_LIB} ${X11_Xext_LIB} ${Xxf86vm}
 		${OPENGL_gl_LIBRARY}
@@ -724,7 +732,7 @@ if (CORE)
 endif()
 
 if (DEDICATED)
-	add_executable(doom3ded.${cpu} WIN32
+	add_executable(doom3ded.${cpu} WIN32 MACOSX_BUNDLE
 		${src_core}
 		${src_stub_openal}
 		${src_stub_gl}
