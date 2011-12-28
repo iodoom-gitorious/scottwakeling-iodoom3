@@ -26,6 +26,9 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
+// Pull in gl before including AppKit/Foundation stuff
+#import "renderer/qgl.h"
+
 // -*- mode: objc -*-
 #import <AppKit/AppKit.h>
 #import <Foundation/Foundation.h>
@@ -407,9 +410,9 @@ static bool CreateGameWindow(  glimpParms_t parms ) {
 #endif
 
 	// Store off the pixel format attributes that we actually got
-	[pixelFormat getValues: (long *) &glConfig.colorBits forAttribute: NSOpenGLPFAColorSize forVirtualScreen: 0];
-	[pixelFormat getValues: (long *) &glConfig.depthBits forAttribute: NSOpenGLPFADepthSize forVirtualScreen: 0];
-	[pixelFormat getValues: (long *) &glConfig.stencilBits forAttribute: NSOpenGLPFAStencilSize forVirtualScreen: 0];
+	[pixelFormat getValues: (int *) &glConfig.colorBits forAttribute: NSOpenGLPFAColorSize forVirtualScreen: 0];
+	[pixelFormat getValues: (int *) &glConfig.depthBits forAttribute: NSOpenGLPFADepthSize forVirtualScreen: 0];
+	[pixelFormat getValues: (int *) &glConfig.stencilBits forAttribute: NSOpenGLPFAStencilSize forVirtualScreen: 0];
 
 	glConfig.displayFrequency = [[glw_state.gameMode objectForKey: (id)kCGDisplayRefreshRate] intValue];
 
@@ -1255,12 +1258,15 @@ void GLW_InitExtensions( void ) { }
 unsigned long Sys_QueryVideoMemory() {
 	CGLError err;
 	CGLRendererInfoObj rendererInfo, rendererInfos[MAX_RENDERER_INFO_COUNT];
-	long rendererInfoIndex, rendererInfoCount = MAX_RENDERER_INFO_COUNT;
-	long rendererIndex, rendererCount;
-	long maxVRAM = 0, vram = 0;
-	long accelerated;
-	long rendererID;
-	long totalRenderers = 0;
+	long rendererInfoIndex;
+    GLint rendererInfoCount = MAX_RENDERER_INFO_COUNT;
+    long rendererIndex;
+    GLint rendererCount;
+    long maxVRAM = 0;
+    GLint vram = 0;
+    GLint accelerated;
+    GLint rendererID;
+    long totalRenderers = 0;
 
 	err = CGLQueryRendererInfo(CGDisplayIDToOpenGLDisplayMask(Sys_DisplayToUse()), rendererInfos, &rendererInfoCount);
 	if (err) {
