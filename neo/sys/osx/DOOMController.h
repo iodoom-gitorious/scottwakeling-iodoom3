@@ -3,13 +3,7 @@
 #import <AppKit/AppKit.h>
 
 @interface DOOMController : NSObject
-{
-	//    IBOutlet NSPanel *bannerPanel;
-}
-
-//- (IBAction)paste:(id)sender;
-//- (IBAction)requestTerminate:(id)sender;
-
-//- (void) showBanner;
-
+- (void)quakeMain;
+- (BOOL)checkRegCodes;
+- (BOOL)checkOS;
 @end

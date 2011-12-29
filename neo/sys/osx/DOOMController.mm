@@ -79,13 +79,6 @@ struct RegCodeInfo
 
 static OSErr DoRegCodeDialog( char* ioRegCode1 );
 
-
-@interface DOOMController (Private)
-- (void)quakeMain;
-- (BOOL)checkRegCodes;
-- (BOOL)checkOS;
-@end
-
 @implementation DOOMController
 
 /*
