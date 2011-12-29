@@ -6,7 +6,7 @@
 */
 
 #include "SDL.h"
-#include "SDLMain.h"
+#include "DOOMController.h"
 #include <sys/param.h> /* for MAXPATHLEN */
 #include <unistd.h>
 
@@ -198,7 +198,7 @@ static void setupWindowMenu(void)
 static void CustomApplicationMain (int argc, char **argv)
 {
     NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
-    SDLMain				*sdlMain;
+    DOOMController		*doom;
 
     /* Ensure the application object is initialised */
     [NSApplication sharedApplication];
@@ -219,14 +219,14 @@ static void CustomApplicationMain (int argc, char **argv)
     setApplicationMenu();
     setupWindowMenu();
 
-    /* Create SDLMain and make it the app delegate */
-    sdlMain = [[SDLMain alloc] init];
-    [NSApp setDelegate:sdlMain];
+    /* Create DOOMController and make it the app delegate */
+    doom = [[DOOMController alloc] init];
+    [NSApp setDelegate:doom];
     
     /* Start the main event loop */
     [NSApp run];
     
-    [sdlMain release];
+    [doom release];
     [pool release];
 }
 
