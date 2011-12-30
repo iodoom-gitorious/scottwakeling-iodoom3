@@ -62,6 +62,13 @@ else()
 	string(TOLOWER "${CMAKE_SYSTEM_NAME}" os)
 endif()
 
+# shared lib naming convention (see idSysLocal::DLL_GetFileName)
+if (APPLE)
+	set(cpustring "")
+else()
+	set(cpustring ${cpu})
+endif()
+
 # build type
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RelWithDebInfo")
@@ -733,7 +740,7 @@ if (CORE)
 endif()
 
 if (DEDICATED)
-	add_executable(doom3ded.${cpu} WIN32 MACOSX_BUNDLE
+	add_executable(doom3ded-${cpu} WIN32 MACOSX_BUNDLE
 		${src_core}
 		${src_stub_openal}
 		${src_stub_gl}
@@ -742,9 +749,9 @@ if (DEDICATED)
 		${src_sys_dedicated}
 	)
 
-	set_target_properties(doom3ded.${cpu} PROPERTIES COMPILE_DEFINITIONS "ID_DEDICATED;__DOOM_DLL__")
-	set_target_properties(doom3ded.${cpu} PROPERTIES LINK_FLAGS "${ldflags}")
-	target_link_libraries(doom3ded.${cpu}
+	set_target_properties(doom3ded-${cpu} PROPERTIES COMPILE_DEFINITIONS "ID_DEDICATED;__DOOM_DLL__")
+	set_target_properties(doom3ded-${cpu} PROPERTIES LINK_FLAGS "${ldflags}")
+	target_link_libraries(doom3ded-${cpu}
 		idlib${cpu}
 		${VORBISFILE_LIBRARIES}
 		${VORBIS_LIBRARIES}
@@ -756,21 +763,21 @@ if (DEDICATED)
 endif()
 
 if (GAME)
-	add_library(game${cpu} SHARED ${src_game})
-	set_target_properties(game${cpu} PROPERTIES PREFIX "")
-	set_target_properties(game${cpu} PROPERTIES COMPILE_DEFINITIONS "GAME_DLL")
-	set_target_properties(game${cpu} PROPERTIES COMPILE_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/game")
-	set_target_properties(game${cpu} PROPERTIES LINK_FLAGS "${ldflags}")
-	set_target_properties(game${cpu} PROPERTIES INSTALL_NAME_DIR "@executable_path")
-	target_link_libraries(game${cpu} idlib${cpu})
+	add_library(game${cpustring} SHARED ${src_game})
+	set_target_properties(game${cpustring} PROPERTIES PREFIX "")
+	set_target_properties(game${cpustring} PROPERTIES COMPILE_DEFINITIONS "GAME_DLL")
+	set_target_properties(game${cpustring} PROPERTIES COMPILE_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/game")
+	set_target_properties(game${cpustring} PROPERTIES LINK_FLAGS "${ldflags}")
+	set_target_properties(game${cpustring} PROPERTIES INSTALL_NAME_DIR "@executable_path")
+	target_link_libraries(game${cpustring} idlib${cpu})
 endif()
 
 if (D3XP)
-	add_library(game${cpu}-d3xp SHARED ${src_d3xp})
-	set_target_properties(game${cpu}-d3xp PROPERTIES PREFIX "")
-	set_target_properties(game${cpu}-d3xp PROPERTIES COMPILE_DEFINITIONS "GAME_DLL;_D3XP;CTF")
-	set_target_properties(game${cpu}-d3xp PROPERTIES COMPILE_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/d3xp")
-	set_target_properties(game${cpu}-d3xp PROPERTIES LINK_FLAGS "${ldflags}")
-	set_target_properties(game${cpu}-d3xp PROPERTIES INSTALL_NAME_DIR "@executable_path")
-	target_link_libraries(game${cpu}-d3xp idlib${cpu})
+	add_library(game${cpustring}-d3xp SHARED ${src_d3xp})
+	set_target_properties(game${cpustring}-d3xp PROPERTIES PREFIX "")
+	set_target_properties(game${cpustring}-d3xp PROPERTIES COMPILE_DEFINITIONS "GAME_DLL;_D3XP;CTF")
+	set_target_properties(game${cpustring}-d3xp PROPERTIES COMPILE_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/d3xp")
+	set_target_properties(game${cpustring}-d3xp PROPERTIES LINK_FLAGS "${ldflags}")
+	set_target_properties(game${cpustring}-d3xp PROPERTIES INSTALL_NAME_DIR "@executable_path")
+	target_link_libraries(game${cpustring}-d3xp idlib${cpu})
 endif()
