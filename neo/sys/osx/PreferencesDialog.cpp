@@ -190,15 +190,6 @@ void Sys_DoPreferences( void ) {
 			}
 		}
 	}
-	useOpenAL = CFPreferencesGetAppBooleanValue (kPref_PrefsDialogOpenAL, kCFPreferencesCurrentApplication, &keyFound);
-	if ( keyFound && useOpenAL ) {
-		cvarSystem->SetCVarInteger( "com_asyncSound", 1 );
-		cvarSystem->SetCVarInteger( "s_useOpenAL", 1 );
-	}
-	else {
-		cvarSystem->SetCVarInteger( "com_asyncSound", 2 );
-		cvarSystem->SetCVarInteger( "s_useOpenAL", 0 );
-	}
 }
 
 
