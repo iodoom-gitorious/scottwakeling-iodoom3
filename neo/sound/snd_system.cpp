@@ -327,7 +327,7 @@ void idSoundSystemLocal::Init() {
 		idSampleDecoder::Init();
 		soundCache = new idSoundCache();
 	}
-
+    
 	// set up openal device and context
 	common->StartupVariable( "s_useOpenAL", true );
 	common->StartupVariable( "s_useEAXReverb", true );
@@ -337,6 +337,12 @@ void idSoundSystemLocal::Init() {
 	openalContext = alcCreateContext( openalDevice, NULL );
 	alcMakeContextCurrent( openalContext );
 	common->Printf( "Done.\n" );
+    
+    // log openal info
+    common->Printf( "AL_VERSION: %s\n", alGetString(AL_VERSION));
+    common->Printf( "AL_VENDOR: %s\n", alGetString(AL_VENDOR));
+    common->Printf( "AL_RENDERER: %s\n", alGetString(AL_RENDERER));
+    common->Printf( "AL_EXTENSIONS: %s\n", alGetString(AL_EXTENSIONS));
 
 #if ID_OPENAL_EAX
 	// try to obtain EAX extensions
