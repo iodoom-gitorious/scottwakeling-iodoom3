@@ -29,41 +29,76 @@ Note that Doom 3 and Doom 3: Resurrection of Evil are available from the Steam s
 http://store.steampowered.com/app/9050/
 http://store.steampowered.com/app/9070/
 
-Other platforms, updated source code, security issues:
-------------------------------------------------------
+Compiling
+---------
 
-If you have obtained this source code several weeks after the time of release,
-it is likely that you can find modified and improved
-versions of the engine in various open source projects across the internet.
-Depending what is your interest with the source code, those may be a better
-starting point.
+The build system is based on CMake: http://cmake.org/
 
-Compiling on win32:
--------------------
+Required libraries are not part of the tree. These are:
+- libjpeg (minimum v6, v8 recommended)
+- libogg
+- libvorbis
+- libvorbisfile (may be part of libvorbis)
+- OpenAL (OpenAL Soft recommended, Creative's and Apple's versions are made of fail)
+- SDL v1.2
+- libcurl (optional, required for server downloads)
 
-A project file for Microsoft Visual Studio 2010 is provided in neo\doom.sln
-We expect the solution file is compatible with the Express releases
+For UNIX like system these libraries need to be installed (including the
+developer files). It is recommended to use the software management tools of
+your OS (apt-get, portage, rpm, BSD ports, MacPorts, ...).
 
-You will need the Microsoft DirectX SDK installed as well.
-If it does not reside in "C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)"
-you will need to update the project files accordingly.
+For Windows there are two options:
+1) Use the provided binaries (recommended, see below)
+2) Compile these libraries yourself
 
-Compiling on GNU/Linux x86:
----------------------------
+Create a distinct build folder outside of this source repository and issue
+the cmake command there, pointing it at the neo/ folder from this repository:
+cmake /path/to/repository/neo
 
-The build system on GNU/Linux is based on SCons: http://www.scons.org/
-Issue the scons command in the neo/ folder.
+Using the provided Windows binaries:
+------------------------------------
+Get a clone of the latest binaries here: https://github.com/dhewg/doom3-libs
 
-Compiling on MacOS X:
----------------------------
+There are two subfolder:
+- 32bit binaries are located in "i686-w64-mingw32"
+- 64bit binaries are located in "x86_64-w64-mingw32"
 
-XCode 3.2 project is under neo/sys/osx/
+Issue the appropriate command from the build folder, for example:
+
+cmake -G "Visual Studio 10" -DDOOM3LIBS=/path/to/doom3-libs/i686-w64-mingw32 /path/to/repository/neo
+cmake -G "Visual Studio 10 Win64" -DDOOM3LIBS=/path/to/doom3-libs/x86_64-w64-mingw32 /path/to/repository/neo
+
+The binaries are compatible with mingw-w64 and all MSVC versions.
+
+Cross compiling:
+----------------
+
+For cross compiling a CMake Toolchain file is required.
+For the mingw-w64 toolchain "i686-w64-mingw32" on Ubuntu precise it looks like:
+
+< --- cut --- >
+set(CMAKE_SYSTEM_NAME Windows)
+set(CMAKE_SYSTEM_PROCESSOR i686)
+
+set(CMAKE_C_COMPILER i686-w64-mingw32-gcc)
+set(CMAKE_CXX_COMPILER i686-w64-mingw32-g++)
+set(CMAKE_RC_COMPILER i686-w64-mingw32-windres)
+
+set(CMAKE_FIND_ROOT_PATH /usr/i686-w64-mingw32)
+
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+< --- cut --- >
+
+Then point CMake at your Toolchain file:
+cmake -DCMAKE_TOOLCHAIN_FILE=/path/to/Toolchain.cmake -DDOOM3LIBS=/path/to/doom3-libs/i686-w64-mingw32 /path/to/repository/neo
 
 Back End Rendering of Stencil Shadows:
 --------------------------------------
 
 The Doom 3 GPL source code release does not include functionality enabling rendering
-of stencil shadows via the “depth fail” method, a functionality commonly known as 
+of stencil shadows via the “depth fail” method, a functionality commonly known as
 "Carmack's Reverse".
 
 MayaImport:
@@ -82,36 +117,9 @@ ADDITIONAL TERMS:  The Doom 3 GPL Source Code is also subject to certain additio
 
 EXCLUDED CODE:  The code described below and contained in the Doom 3 GPL Source Code release is not part of the Program covered by the GPL and is expressly excluded from its terms.  You are solely responsible for obtaining from the copyright holder a license for such code and complying with the applicable license terms.
 
-Curl library
----------------------------------------------------------------------------
-lines	file(s)
-		neo/curl/*, neo/curl/README
-		
-COPYRIGHT AND PERMISSION NOTICE
-
-Copyright (c) 1996 - 2004, Daniel Stenberg, <daniel@haxx.se>.
-
-All rights reserved.
-
-Permission to use, copy, modify, and distribute this software for any purpose
-with or without fee is hereby granted, provided that the above copyright
-notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. IN
-NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
-OR OTHER DEALINGS IN THE SOFTWARE.
-
-Except as contained in this notice, the name of a copyright holder shall not
-be used in advertising or otherwise to promote the sale, use or other dealings
-in this Software without prior written authorization of the copyright holder.
-
 JPEG library
 -----------------------------------------------------------------------------
-neo/renderer/jpeg-6/*, renderer/Image_files.cpp
+neo/renderer/jpeg_memory_src.*
 
 This software is copyright (C) 1991-2011, Thomas G. Lane, Guido Vollbeding.
 All Rights Reserved except as specified below.
@@ -134,48 +142,16 @@ These conditions apply to any software derived from or based on the IJG code,
 not just to the unmodified library.  If you use our work, you ought to
 acknowledge us.
 
-NOTE: unfortunately the README that came with our copy of the library has
-been lost, so the one from release 6b is included instead. There are a few
-'glue type' modifications to the library to make it easier to use from
-the engine, but otherwise the dependency can be easily cleaned up to a
-better release of the library.
+Permission is NOT granted for the use of any IJG author's name or company name
+in advertising or publicity relating to this software or products derived from
+it.  This software may be referred to only as "the Independent JPEG Group's
+software".
 
-OggVorbis 
----------------------------------------------------------------------------
-neo/sound/OggVorbis/*
-neo/sound/OggVorbis/ogg/README
-neo/sound/OggVorbis/vorbis/README
-			
-Copyright (c) 2002, Xiph.org Foundation
+We specifically permit and encourage the use of this software as the basis of
+commercial products, provided that all warranty or liability claims are
+assumed by the product vendor.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-
-- Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-
-- Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-
-- Neither the name of the Xiph.org Foundation nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION
-OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-PropTree 
+PropTree
 ---------------------------------------------------------------------------
 neo/tools/common/PropTree/*
 
@@ -185,42 +161,15 @@ http://www.gonavi.com
 
 This material is provided "as is", with absolutely no warranty expressed
 or implied. Any use is at your own risk.
- 
-Permission to use or copy this software for any purpose is hereby granted 
+
+Permission to use or copy this software for any purpose is hereby granted
 without fee, provided the above notices are retained on all copies.
 Permission to modify the code and to distribute modified code is granted,
 provided the above notices are retained, and a notice that the code was
 modified is included with the above copyright notice.
- 
+
 If you use this code, drop me an email.  I'd like to know if you find the code
 useful.
-
-OpenAL SDK
----------------------------------------------------------------------------
-neo/openal/docs/*
-neo/openal/include/*
-neo/openal/lib/*
-neo/openal/osx/*
-
-/**
- * OpenAL cross platform audio library
- * Copyright (C) 1999-2000 by authors.
- * This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Library General Public
- *  License as published by the Free Software Foundation; either
- *  version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- *  License along with this library; if not, write to the
- *  Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- *  Boston, MA  02111-1307, USA.
- * Or go to http://www.gnu.org/copyleft/lgpl.html
- */
 
 Base64 implementation
 ---------------------------------------------------------------------------
@@ -323,7 +272,6 @@ Copyright (C) 1995-1998 Mark Adler
 OpenGL headers
 ---------------------------------------------------------------------------
 lines	file(s)
-5920	neo/renderer/glext.h
 613		neo/renderer/wglext.h
 
 /*
@@ -334,73 +282,26 @@ lines	file(s)
 ** this file except in compliance with the License. You may obtain a copy
 ** of the License at Silicon Graphics, Inc., attn: Legal Services, 1600
 ** Amphitheatre Parkway, Mountain View, CA 94043-1351, or at:
-** 
+**
 ** http://oss.sgi.com/projects/FreeB
-** 
+**
 ** Note that, as provided in the License, the Software is distributed on an
 ** "AS IS" basis, with ALL EXPRESS AND IMPLIED WARRANTIES AND CONDITIONS
 ** DISCLAIMED, INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES AND
 ** CONDITIONS OF MERCHANTABILITY, SATISFACTORY QUALITY, FITNESS FOR A
 ** PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
-** 
+**
 ** Original Code. The Original Code is: OpenGL Sample Implementation,
 ** Version 1.2.1, released January 26, 2000, developed by Silicon Graphics,
 ** Inc. The Original Code is Copyright (c) 1991-2002 Silicon Graphics, Inc.
 ** Copyright in any portions created by third parties is as indicated
 ** elsewhere herein. All Rights Reserved.
-** 
+**
 ** Additional Notice Provisions: This software was created using the
 ** OpenGL(R) version 1.2.1 Sample Implementation published by SGI, but has
 ** not been independently verified as being compliant with the OpenGL(R)
 ** version 1.2.1 Specification.
 */
-
-NV-CONTROL X Extension
----------------------------------------------------------------------------
-neo/sys/linux/libXNVCtrl/*
-Copyright NVIDIA Corporation
-
-ExtUtil.h
----------------------------------------------------------------------------
-neo/sys/linux/extutil.h
-/*
- * $Xorg: extutil.h,v 1.4 2001/02/09 02:03:24 xorgcvs Exp $
- *
-Copyright 1989, 1998  The Open Group
-
-Permission to use, copy, modify, distribute, and sell this software and its
-documentation for any purpose is hereby granted without fee, provided that
-the above copyright notice appear in all copies and that both that
-copyright notice and this permission notice appear in supporting
-documentation.
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-OPEN GROUP BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-Except as contained in this notice, the name of The Open Group shall not be
-used in advertising or otherwise to promote the sale, use or other dealings
-in this Software without prior written authorization from The Open Group.
- *
- * Author:  Jim Fulton, MIT The Open Group
- * 
- *                     Xlib Extension-Writing Utilities
- *
- * This package contains utilities for writing the client API for various
- * protocol extensions.  THESE INTERFACES ARE NOT PART OF THE X STANDARD AND
- * ARE SUBJECT TO CHANGE!
- */
-
-OSS headers
----------------------------------------------------------------------------
-neo/sys/linux/oss/*
-Copyright by 4Front Technologies 1993-2004
 
 Brandelf utility
 ---------------------------------------------------------------------------
@@ -438,7 +339,7 @@ lines	file(s)
  */
 
 makeself - Make self-extractable archives on Unix
---------------------------------------------------------------------------- 
+---------------------------------------------------------------------------
 neo/sys/linux/setup/makeself/*, neo/sys/linux/setup/makeself/README
 Copyright (c) Stéphane Peter
 Licensing: GPL v2

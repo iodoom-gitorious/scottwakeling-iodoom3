@@ -419,7 +419,7 @@ uintptr_t Sys_DLL_Load( const char *dllName ) {
 		GetModuleFileName( libHandle, loadedPath, sizeof( loadedPath ) - 1 );
 		if ( idStr::IcmpPath( dllName, loadedPath ) ) {
 			Sys_Printf( "ERROR: LoadLibrary '%s' wants to load '%s'\n", dllName, loadedPath );
-			Sys_DLL_Unload( (int)libHandle );
+			Sys_DLL_Unload( (uintptr_t)libHandle );
 			return 0;
 		}
 	}
@@ -746,12 +746,4 @@ Sys_SetFatalError
 ==================
 */
 void Sys_SetFatalError( const char *error ) {
-}
-
-/*
-==================
-Sys_DoPreferences
-==================
-*/
-void Sys_DoPreferences( void ) {
 }
